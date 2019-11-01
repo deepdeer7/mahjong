@@ -1,0 +1,9 @@
+.mahjong--title {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.mahjong--main {
+  display: grid;
+  grid: repeat(3, 120px) / repeat(10, 120px);
+  justify-content: center;
+}

@@ -1,0 +1,14 @@
+<div class="mahjong">
+  <header class="mahjong--title">
+	  <h1>Mahjong-like game</h1>
+  </header>
+  <main class="mahjong--main">
+    <div *ngFor="let number of primeNumbers; let i = index;">
+      <app-card
+        #card
+        [data]="{value: number, id: i}"
+        (click)="card.show()">
+      </app-card>
+    </div>
+  </main>
+</div>
