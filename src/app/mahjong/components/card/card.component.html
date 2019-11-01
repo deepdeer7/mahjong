@@ -1,4 +1,5 @@
-<div [@card]="isVisible ? 'active' : 'disabled'" class="card">
+<div [ngClass]="{disabled: isDisabled}"
+  [@card]="isVisible ? 'active' : 'disabled'" class="card">
   <span [@visibility]="isVisible ? 'visible' : 'invisible'" class="card--value">
     {{data.value}}
   </span>

@@ -3,8 +3,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CardService } from './services/card.service';
 import { ArrayHelper } from './helpers/array.helper';
-import { PRIME_NUMBERS } from './config/constants';
+import { PrimeNumbersHelper } from './helpers/prime-numbers.helper';
 import { Card } from './domain/card';
+import { PRIME_NUMBERS_TO } from './config/constants';
 
 @Component({
   selector: 'app-mahjong',
@@ -35,7 +36,8 @@ export class MahjongComponent implements OnInit, OnDestroy {
   }
 
   private getDoubledShuffledPrimeNumbers(): number[] {
-    const doublePrimeNumbers = ArrayHelper.double(PRIME_NUMBERS);
+    const primeNumbersTo50 = PrimeNumbersHelper.generatePrimeNumbersTo(PRIME_NUMBERS_TO);
+    const doublePrimeNumbers = ArrayHelper.double(primeNumbersTo50);
     return ArrayHelper.shuffle(doublePrimeNumbers);
   }
 

@@ -7,10 +7,10 @@ import {
   transition
 } from '@angular/animations';
 import { Subject, of } from 'rxjs';
-import { filter, delay, takeUntil } from 'rxjs/operators';
+import { delay, takeUntil } from 'rxjs/operators';
 import { CardService } from '../../services/card.service';
 import { Card } from '../../domain/card';
-import { SHOW_ALL_CARDS_DELAY } from '../../config/constants';
+import { SHOW_ALL_CARDS_DELAY, DISABLED_CARD_DELAY } from '../../config/constants';
 
 @Component({
   selector: 'app-card',
@@ -36,7 +36,7 @@ import { SHOW_ALL_CARDS_DELAY } from '../../config/constants';
         boxShadow: '0 0 8px rgba(0,0,0,0.5)'
       })),
       transition('disabled <=> active', [
-        animate('4s')
+        animate('2s')
       ])
     ]),
   ]]
@@ -44,6 +44,7 @@ import { SHOW_ALL_CARDS_DELAY } from '../../config/constants';
 export class CardComponent implements OnInit, OnDestroy {
   @Input() public data: Card;
   public isVisible = true;
+  public isDisabled = true;
   private destroySubject = new Subject<void>();
 
   constructor(private cardService: CardService) {}
@@ -51,13 +52,21 @@ export class CardComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.cardService.cardHidden$
       .pipe(
-        filter((ids: number[]) => ids.includes(this.data.id)),
         delay(50),
         takeUntil(this.destroySubject)
-      ).subscribe(() => {
-        this.setVisibility(false);
+      ).subscribe((ids: number[]) => {
+        if (this.isCardNeededToHide(ids)) {
+          this.setVisibility(false);
+        } else {
+          this.setDisability(true);
+          this.disableCardForTwoSeconds();
+        }
     });
     this.hideCards();
+  }
+
+  private isCardNeededToHide(ids: number[]): boolean {
+    return ids.includes(this.data.id);
   }
 
   ngOnDestroy() {
@@ -65,11 +74,24 @@ export class CardComponent implements OnInit, OnDestroy {
     this.destroySubject.complete();
   }
 
+  private disableCardForTwoSeconds(): void {
+    of(true).pipe(
+    delay(DISABLED_CARD_DELAY))
+    .subscribe(() => {
+      this.setDisability(false);
+    });
+  }
+
+  private setDisability(value: boolean): void {
+    this.isDisabled = value;
+  }
+
   private hideCards(): void {
     of(true).pipe(
     delay(SHOW_ALL_CARDS_DELAY))
     .subscribe(() => {
       this.setVisibility(false);
+      this.disableCardForTwoSeconds();
     });
   }
 
@@ -78,7 +100,7 @@ export class CardComponent implements OnInit, OnDestroy {
   }
 
   public show(): void {
-    if (!this.isVisible) {
+    if (!this.isVisible && !this.isDisabled) {
       this.setVisibility(true);
       this.cardService.compareCard(this.data);
     }
